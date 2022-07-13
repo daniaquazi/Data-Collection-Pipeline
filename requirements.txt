@@ -1,0 +1,9 @@
+pandas
+boto3
+sqlalchemy
+psycopg2
+psycopg-binary
+nltk
+numpy
+selenium
+bs4
