@@ -9,7 +9,7 @@
 
 Milestone 1
 - What website did you decide to scrape?
-Milestoen 2
+Milestone 2
 - What methods did you implement (not comment scraping)
 - Make sure to include your reasoning for choosing your website, the technologies you've used etc.
 Milestone 3
