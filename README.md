@@ -3,10 +3,6 @@
 ![image](https://user-images.githubusercontent.com/46778501/182449479-5f89fd2d-b23b-4212-93eb-be95890effc0.png)
 
 
-
-
-
-
 Milestone 1
 - I decided to scrape the Instagram website. I want to create a scraper bot that is able to get the links of the most recent posts and using this, retrieve the comments.
 
@@ -29,8 +25,11 @@ Milestone 3
     - In the "Get URLS" function, to make sure URLs are unique, I have converted the list into a set in order to remove duplicates.
 
 Milestone 4
-- creating unit tests
-- how testing works for your scraper
+- I have created unit tests i order to show that my code works.
+- 1st unit test- test login: testing wrong log in details to check if it fails.
+- 2nd unit test- dump products: test if a file directory exists.
+- 3rd unit test- scrape comments: testing to see if comments can be scraped.
+- 4th unit test- get urls: testing to see if a URL exists.
 
 Milestone 5
 - Talk about the cloud services you have used and how you interact with them in your code using boto3.
