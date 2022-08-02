@@ -4,11 +4,13 @@ Answer some of these questions in the next few bullet points. What have you buil
 
 Milestone 1
 - I decided to scrape the Instagram website. I want to create a scraper bot that is able to get the links of the most recent posts and using this, retrieve the comments.
+
 Milestone 2
 - I have written code using selenium in order to perform certain actions automatically.
     - Accepting cookies: When loading the instagram website, a pop up appears saying to accept cookies. So, I have written code in order to automatically accept cookies.
-- What methods did you implement (not comment scraping)
-- Make sure to include your reasoning for choosing your website, the technologies you've used etc.
+    - Saving information: Another popup which asks the user to save login information appears so if accepted, the user does not have to login with their user name and password next time. So I have written code in order to bypass this.
+    - Login: In order to navigate through the instagram website, a user has to login. I have hard coded my username and password in the code that I have written, so it will automatically enter in a username and password and click on the "login" button.
+
 Milestone 3
 - function to retirve text (scraping comments)
 - UUID for unique ID for an entry
