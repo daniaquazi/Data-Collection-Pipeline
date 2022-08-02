@@ -1,15 +1,12 @@
 # Data-Collection-Pipeline
 
-
-
-
-
-
-
+Answer some of these questions in the next few bullet points. What have you built? What technologies have you used? Why have you used those?
 
 Milestone 1
-- What website did you decide to scrape?
+- I decided to scrape the Instagram website. I want to create a scraper bot that is able to get the links of the most recent posts and using this, retrieve the comments.
 Milestone 2
+- I have written code using selenium in order to perform certain actions automatically.
+    - Accepting cookies: When loading the instagram website, a pop up appears saying to accept cookies. So, I have written code in order to automatically accept cookies.
 - What methods did you implement (not comment scraping)
 - Make sure to include your reasoning for choosing your website, the technologies you've used etc.
 Milestone 3
