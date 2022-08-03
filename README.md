@@ -35,13 +35,17 @@ Milestone 5
 - Talk about the cloud services you have used and how you interact with them in your code using boto3.
 - S3 - My scraper will be running in headless mode so I will not be able to see exactly what is going on so in each of my methods, I send pictures to a bucket so I am able to see debug my code if anything goes wrong.
 - RDS - After I have collected my comments, I added them into a dataframe because I wanted the data to be in the form of a table. After, I can send this data to an RDS.
-- EC2 - When I was sure that my code works, I created a new EC2 instance which was able to run my scraper.
 
 - boto3 - In order to access the AWS services, S3 and RDS, I used a library called boto3 which allowed the management of AWS services.
 
 Milestone 7
-- Talk about docker and how it works, your code refactorisation and the techniques you used to avoid rescraping data.
+- I installed docker and containerized my scraper so that it can be run in an EC2 instance. 
+- I made sure to run my scraper in headless mode (so that it runs in the background).
+- After making sure my code works and containerizing my scraper, I created a new EC2 instance to run it. I decided to add a cronjob so that it is able to run everyday at a specific time.
+
 Milestone 8
-- talk about prometheus and grafana
+- In this milestone, I set up prometheus so that certain meteric could be collected e.g. which containers are running at the moment and which containers have stopped.
+- I created a Grafana dashboard so that I could convert my metrics into different visualizations which made the metrics easier to read.
+
 Milestone 9
-- Talk about CI/CD pipelines and the process you have developed.
+- After committing my most recent code to Github, I set up a workflow in which my scraper could be built and pushed to Docker Hub.
