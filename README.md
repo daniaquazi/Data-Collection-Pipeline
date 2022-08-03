@@ -33,6 +33,12 @@ Milestone 4
 
 Milestone 5
 - Talk about the cloud services you have used and how you interact with them in your code using boto3.
+- S3 - My scraper will be running in headless mode so I will not be able to see exactly what is going on so in each of my methods, I send pictures to a bucket so I am able to see debug my code if anything goes wrong.
+- RDS - After I have collected my comments, I added them into a dataframe because I wanted the data to be in the form of a table. After, I can send this data to an RDS.
+- EC2 - When I was sure that my code works, I created a new EC2 instance which was able to run my scraper.
+
+- boto3 - In order to access the AWS services, S3 and RDS, I used a library called boto3 which allowed the management of AWS services.
+
 Milestone 7
 - Talk about docker and how it works, your code refactorisation and the techniques you used to avoid rescraping data.
 Milestone 8
