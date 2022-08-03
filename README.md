@@ -2,7 +2,6 @@
 
 ![image](https://user-images.githubusercontent.com/46778501/182449479-5f89fd2d-b23b-4212-93eb-be95890effc0.png)
 
-
 Milestone 1
 - I decided to scrape the Instagram website. I want to create a scraper bot that is able to get the links of the most recent posts and using this, retrieve the comments.
 
