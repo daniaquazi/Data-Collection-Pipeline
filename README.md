@@ -48,3 +48,6 @@ Milestone 8
 
 Milestone 9
 - After committing my most recent code to Github, I set up a workflow in which my scraper could be built and pushed to Docker Hub.
+
+<img width="640" alt="image" src="https://user-images.githubusercontent.com/46778501/184010681-0720b2ce-abca-4d1e-8cf0-09b025127539.png">
+
