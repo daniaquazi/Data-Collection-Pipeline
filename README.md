@@ -31,7 +31,6 @@ Milestone 4
 - 4th unit test- get urls: testing to see if a URL exists.
 
 Milestone 5
-- Talk about the cloud services you have used and how you interact with them in your code using boto3.
 - S3 - My scraper will be running in headless mode so I will not be able to see exactly what is going on so in each of my methods, I send pictures to a bucket so I am able to see debug my code if anything goes wrong.
 - RDS - After I have collected my comments, I added them into a dataframe because I wanted the data to be in the form of a table. After, I can send this data to an RDS.
 
