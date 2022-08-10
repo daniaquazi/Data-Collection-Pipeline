@@ -21,17 +21,26 @@ import boto3
 from sqlalchemy import create_engine
 import psycopg2
 import boto3
-import json
-import ast
-import re
 import psycopg2
 import bs4
 from time import sleep
 import os
 import io
+from urllib.request import urlopen
+from bs4 import BeautifulSoup
+import base64
 
 class Scraper():
+
     def __init__(self, _username, _password):
+
+        '''
+        This function is used to create a constructor to assign values.
+
+        Args:
+            username: for typing in a username
+            password: for typing in a password
+        '''
 
         options = webdriver.FirefoxOptions()
         options.add_argument("--headless")
@@ -53,12 +62,30 @@ class Scraper():
         self.u = _username
         self.p = _password
         self.comments = []
+    
+    def save_in_s3(self, image_name):
+
+        '''
+        This function is used to send images into an S3 bucket
+
+        Args:
+            image_name: for entering the name of the image
+        '''
+
+        screenshot = self.driver.get_screenshot_as_png()
+        s3 = boto3.client('s3', aws_access_key_id = "", aws_secret_access_key = "", region_name='us-east-1')
+        png = io.BytesIO(screenshot)
+        s3.upload_fileobj(png, 'daniascraper2', image_name)
 
     def get_urls(self):
-        username = "fredericmalle"
+
+        '''
+        This function is used to retrieve URLs of recent instagram posts.
+        '''
+
+        username = "london"
         time.sleep(5)
         self.driver.get("https://www.instagram.com/" + username + "/")
-        # self.driver.get_screenshot_as_png("/scraper_folder/scraper.png")
         time.sleep(5)
         t_end = time.time() + 60 / 120
         instagram_urls = []
@@ -67,15 +94,10 @@ class Scraper():
             for j in range(1, 2):
                 self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                 time.sleep(2)
-                # self.export_page_source("after_login")
-                # self.driver.get_screenshot_as_file("/scraper_folder/after_login.png")
 
                 posts = self.driver.find_elements(by=By.XPATH, value='//article[@class = "_aayp"]//div[@class = "_ac7v _aang"]//div[@class = "_aabd _aa8k _aanf"]/a')
                 
-                screenshot = self.driver.get_screenshot_as_png()
-                s3 = boto3.client('s3', aws_access_key_id = "", aws_secret_access_key = "", region_name='us-east-1')
-                png = io.BytesIO(screenshot)
-                s3.upload_fileobj(png, 'daniascraper2', 'urls.png')
+                self.save_in_s3('urls.png')
                 
                 #os.environ["AWS_access_key"]
                 #os.environ["AWS_secret_key"]
@@ -92,14 +114,24 @@ class Scraper():
         instagram_urls = list(a_set)
         print("Unique urls: ", len(instagram_urls))
 
+        return instagram_urls
+
+    def sort_by_date(self):
+
+        '''
+        This function is used to sort the URLs by date.
+        '''
+
+        #instagram_urls = ['https://www.instagram.com/p/CfW7ad2h29I/', 'https://www.instagram.com/p/CfZIJfmDKsO/']
+        instagram_urls = self.get_urls()
         date_of_urls = []
         for c in instagram_urls:
             self.driver.get(c)
             p = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, './/time[@class = "_aaqe"]')))
-            # print(p.get_attribute("title"))
             date_of_urls.append({"Date":p.get_attribute("title"), "url":c})
         
         date_df = pd.DataFrame(date_of_urls)
+        print(date_df)
         date_df["Date"] = pd.to_datetime(date_df["Date"])
         date_df.sort_values(by='Date', ascending = False, inplace=True)
         date_df.drop('Date', inplace=True, axis=1)
@@ -112,7 +144,12 @@ class Scraper():
         return df
 
     def create_uuids_for_url_list(self):
-        url = self.get_urls()
+
+        '''
+        This function is used to retrieve a unique UUID to assign to each of the URLs
+        '''
+
+        url = self.sort_by_date()
         ig_urls = [i.rsplit('/', 2)[-2] for i in url]
         uuid_list = [str(uuid4()) for x in ig_urls]
         dic = [str(x[0]) + '--' + x[1] for x in zip(ig_urls, uuid_list)]
@@ -125,20 +162,15 @@ class Scraper():
         return s
 
     def accept_cookies(self):
-        #self.export_page_source("htmltext2")
-        #html_file = self.export_page_source("cookies")
 
+        '''
+        This function is used to automatically accept cookies in the instagram webpage.
+        '''
 
-        # html = self.driver.page_source
-        # s3.upload_fileobj(html, 'daniascraper', 'htmll.txt')
-
-        screenshot = self.driver.get_screenshot_as_png()
-        s3 = boto3.client('s3', aws_access_key_id = "", aws_secret_access_key = "", region_name='us-east-1')
-        png = io.BytesIO(screenshot)
-        s3.upload_fileobj(png, 'daniascraper2', 'cookies.png')
+        self.save_in_s3('cookies.png')
         
         time.sleep(10)
-        #self.driver.find_element_by_xpath(By=By.XPATH, value="//body").send_keys(Keys.END)
+
         try:
             try:
                 # print(self.driver.page_source)
@@ -153,11 +185,15 @@ class Scraper():
                     print("Cookies button not found")
         except Exception:
             pass
-                
-        #self.driver.implicitly_wait(10)
+
         time.sleep(5)
 
     def scrape_comments(self):
+
+        '''
+        This function is used to scrape the comments from each of the posts.
+        '''
+
         count = 0
         insta_urls = self.create_uuids_for_url_list()
         #insta_urls = ['https://www.instagram.com/p/CfW7ad2h29I/', 'https://www.instagram.com/p/CfZIJfmDKsO/']
@@ -168,10 +204,7 @@ class Scraper():
                 time.sleep(5)
                 self.driver.get(i)
 
-                screenshot = self.driver.get_screenshot_as_png()
-                s3 = boto3.client('s3', aws_access_key_id = "", aws_secret_access_key = "", region_name='us-east-1')
-                png = io.BytesIO(screenshot)
-                s3.upload_fileobj(png, 'daniascraper2', 'post.png')
+                self.save_in_s3('post.png')
 
                 count = count + 1
                 print(count)
@@ -195,6 +228,11 @@ class Scraper():
         return df
 
     def perform_sentiment_analysis(self):
+
+        '''
+        This function is used to calculate the sentiments for all comments.
+        '''
+        
         comments = self.scrape_comments()
         sAnalyser = SentimentIntensityAnalyzer()
         comments['comments'] = comments['comments'].astype(str)
@@ -212,76 +250,71 @@ class Scraper():
         comments = comments.astype('string')
         return comments
 
-    def retry_click(self, number_of_retries, wait_before_performing_click):
-        while number_of_retries > 0:
-            time.sleep(wait_before_performing_click)
-            try:
-                self.turn_on_notifs = WebDriverWait(self.driver, 20).until(EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Not Now')]"))).click()
-                break
-            except:
-                pass
-            number_of_retries = number_of_retries - 1
-            print(number_of_retries)
-
     def save_information(self):
+
+        '''
+        This function is used close a popup that appears after logging in.
+        '''
+
         try:
             self.save_info = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, "//button[contains(text(), 'Not now')]"))).click()
         except (TimeoutException, NoSuchElementException):
             pass
-        # self.save_info = self.driver.find_element(By.XPATH, "//button[contains(text(), 'Not now')]")
-        # self.save_info.click()
-        # element_to_be_clickable
+
             time.sleep(5)
+        
         try:
             self.turn_on_notifs = WebDriverWait(self.driver, 20).until(EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Not Now')]"))).click()
         except (TimeoutException, NoSuchElementException):
             pass
-        # self.turn_on_notifs = self.driver.find_element(By.XPATH, "//button[contains(text(), 'Not Now')]")
-        # self.turn_on_notifs.click()
-        # try:
-        #     self.turn_on_notifs = WebDriverWait(self.driver, 20).until(EC.element_to_be_clickable((By.XPATH, "//button[@class='(text(), 'Not Now')]"))).click()
-        #     print('Clicked it')
-        # except:
-        #     print('Either element was not found, or Bot could not click on it.')
-        #     self.driver.refresh()
-        #     self.retry_click(20, 10)
-        #     pass
-        # time.sleep(5)
-
-
 
     def login(self):
+
+        '''
+        This function is used log in to the instagram account.
+        '''
+
         sleep(2)
 
-        # self.accept_cookies()
         username = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, "input[name='username']")))
         password = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, "input[name='password']")))
         username.clear()
         password.clear()
-        #username.send_keys("dummypracticetest2")
-        #password.send_keys("dummy12345")
         username.send_keys(self.u)
         password.send_keys(self.p)
         log_in = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, "button[type='submit']"))).click()
         time.sleep(10)
-        # print(self.driver.page_source)
 
-        screenshot = self.driver.get_screenshot_as_png()
-        s3 = boto3.client('s3', aws_access_key_id = "", aws_secret_access_key = "", region_name='us-east-1')
-        png = io.BytesIO(screenshot)
-        s3.upload_fileobj(png, 'daniascraper2', 'login.png')
+        self.save_in_s3('login.png')
 
         print("logged in")
+
+    def scrape_pictures(self):
+        htmldata = urlopen("https://www.instagram.com/chantecaille/")
+        soup = BeautifulSoup(htmldata, 'html.parser')
+        images = soup.find_all('img')
+        print(len(images))
+        
+        for item in images:
+            i = item['src']
+            image = i.replace("data:image/png;base64,", "")
+            print(image)
+            imgdata = base64.b64decode(image)
+            print(type(imgdata))
+            print(imgdata)
+
+        with open("/Users/dq/Documents/dania_instagram_scraper/image.png", "wb") as fh:
+            fh.write(imgdata)
         
 
-    def export_page_source(self, filepath : str):
-        soup = self.driver.page_source
-        soup = bs4.BeautifulSoup(soup,"html.parser")
-        soup = str(soup.prettify)
+    # def export_page_source(self, filepath : str):
+    #     soup = self.driver.page_source
+    #     soup = bs4.BeautifulSoup(soup,"html.parser")
+    #     soup = str(soup.prettify)
         
-        with open(f"/Users/dq/Documents/instagram_scraper/scraper_folder/{filepath}.txt", 'w') as f:
-        # with open(f"{filepath}.txt", 'w') as f:
-            f.write(soup)
+    #     with open(f"/Users/dq/Documents/instagram_scraper/scraper_folder/{filepath}.txt", 'w') as f:
+    #     # with open(f"{filepath}.txt", 'w') as f:
+    #         f.write(soup)
 
 if __name__ == "__main__":
     username = ['dummypracticetest4', 'dummypracticetest2', 'dummypracticetest3', 'dummypracticetest4']
